@@ -55,9 +55,21 @@ def generate_image(dsl_text):
     with open(input_file, 'w') as f:
         f.write(dsl_text)
 
-    subprocess.run(['ontol', input_file, '--output-dir', USER_RESULTS_DIR], check=True)
-    create_zip(USER_RESULTS_DIR)
+    process = subprocess.Popen(
+        ['ontol', input_file, '--output-dir', USER_RESULTS_DIR],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True
+    )
 
+    logs = []
+    for line in process.stdout:
+        logs.append(line.strip())
+
+    process.wait() 
+
+    create_zip(USER_RESULTS_DIR)
+    return "\n".join(logs)  
 
 if st.session_state['first_load']:
     st.session_state['first_load'] = False
@@ -69,11 +81,14 @@ dsl_code = st.text_area('Введите DSL-код', value=DEFAULT_TEXT, height=
 if st.button('Сгенерировать изображение', icon='🖼'):
     if dsl_code.strip():
         try:
-            generate_image(dsl_code)
+            logs = generate_image(dsl_code)
             image_path = os.path.join(USER_RESULTS_DIR, 'ontology.png')
             st.image(image_path, caption='Сгенерированное изображение')
-        except Exception as e:
-            st.error(f'Ошибка генерации: {e}')
+        except Exception:
+            st.error(f'Ошибка генерации')
+        finally:
+            with st.expander("📜 Логи выполнения (нажмите, чтобы раскрыть)"):
+                st.text(logs)
     else:
         st.warning('Введите код на DSL Ontol')
 
