@@ -8,6 +8,15 @@ from code_editor import code_editor
 
 st.set_page_config(page_title='Ontol DSL Online REPL', layout='wide')
 
+def get_ontol_version():
+    try:
+        version = subprocess.check_output(["ontol", "--version"], text=True).strip()
+        return version
+    except Exception as e:
+        return f"Ошибка получения версии: {e}"
+
+ONTOL_VERSION = get_ontol_version()
+
 DEFAULT_TEXT = """version: '1.0'
 title: 'Set theory'
 author: ''
@@ -112,6 +121,7 @@ def generate_image(dsl_text):
 
 
 st.title('Ontol DSL Online REPL')
+st.markdown(f"**Ontol Version:** `{ONTOL_VERSION}`")
 
 col1, col2 = st.columns(2)
 
