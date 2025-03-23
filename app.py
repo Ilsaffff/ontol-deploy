@@ -121,7 +121,7 @@ def generate_image(dsl_text):
 
 
 st.title('Ontol DSL Online REPL')
-st.markdown(f"**Ontol Version:** `{ONTOL_VERSION}`")
+st.markdown(f"`{ONTOL_VERSION}`")
 
 col1, col2 = st.columns(2)
 
